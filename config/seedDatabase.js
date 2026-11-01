@@ -6,6 +6,7 @@ import CelebrityPatron from "../models/celebrityPatron.model.js";
 import News from "../models/news.model.js";
 import Blog from "../models/blog.model.js";
 import Review from "../models/review.model.js";
+import Artist from "../models/artist.model.js";
 
 export const seedDatabase = async () => {
   try {
@@ -476,6 +477,9 @@ export const seedDatabase = async () => {
           readTime: "3 min read",
           image:
             "https://images.unsplash.com/photo-1579783902614-a3fb3927b675?auto=format&fit=crop&w=1200&q=85",
+          video:
+            "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
+          mediaType: "video",
           summary:
             "A landmark exhibition featuring 28 original wasli frescoes, drawing international museum curators, heritage architects, and private connoisseurs worldwide.",
           link: "/contact?subject=exhibition-inquiry",
@@ -592,6 +596,128 @@ export const seedDatabase = async () => {
           artworkTitle: "Royal Hunting Expedition",
           verified: true,
           isApproved: true,
+        },
+      ]);
+    }
+
+    // 9. Seed Artists
+    const artistCount = await Artist.countDocuments();
+    if (artistCount === 0) {
+      console.log("Seeding default Master Artists...");
+      await Artist.create([
+        {
+          name: "Pt. Ramnarayan Sharma",
+          slug: "ramnarayan-sharma",
+          location: "Tikamgarh, Bundelkhand",
+          region: "Bundelkhand",
+          role: "Master Fresco & Miniature Painter",
+          avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80",
+          coverImage: "https://images.unsplash.com/photo-1579783902614-a3fb3927b675?auto=format&fit=crop&w=1400&q=80",
+          shortBio: "Guardian of the 400-year-old Orchha fresco tradition, grinding pure lapis, cinnabar, and gold dust by hand.",
+          biography: "Pt. Ramnarayan Sharma is a seventh-generation master artisan from Tikamgarh who dedicated five decades to conserving and continuing the royal fresco techniques of Bundelkhand. Educated in ancient Sanskrit silpa treatises by his grandfather, he sources his lapis lazuli, lamp black, malachite, and pure 24-karat gold leaf according to traditional lunar calendars.",
+          journey: "Starting at the age of twelve helping his father restore the fresco corridors of Orchha's royal monuments, Pt. Sharma has trained more than forty apprentices. His works have been exhibited at prestigious national museums, cultural academies, and fine private collections across India and abroad.",
+          style: "Bundelkhand Royal Fresco & Miniature",
+          mediums: ["Natural Stone Pigments on Wasli Paper", "Tempera on Seasoned Wood", "Gold Leaf Illumination"],
+          experienceYears: 42,
+          artworkCount: 8,
+          awards: ["National Master Craftsman Award", "Bundelkhand Ratna Puraskar"],
+          featured: true,
+          order: 1,
+        },
+        {
+          name: "Devaki Bai Prajapati",
+          slug: "devaki-bai-prajapati",
+          location: "Chhatarpur, Madhya Pradesh",
+          region: "Bundelkhand",
+          role: "Folk Artisan & Terracotta Sculptor",
+          avatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=400&q=80",
+          coverImage: "https://images.unsplash.com/photo-1582561424760-0321d75e81fa?auto=format&fit=crop&w=1400&q=80",
+          shortBio: "Celebrated for reviving Bundelkhand's festive Sanjhi wall reliefs and ceremonial terracotta figures.",
+          biography: "Devaki Bai Prajapati was raised in a renowned potter-artisan clan of Chhatarpur. She transforms river silt from the Ken River into poetic earthen reliefs depicting the monsoon fertility goddess, village shrines, and ritual peacock motifs.",
+          journey: "Devaki Bai transformed what was once temporary festival wall art into durable, museum-quality terracotta panels and pigment paintings. She leads an all-women artisan cooperative that supports over 60 village craftswomen in Bundelkhand.",
+          style: "Bundeli Sanjhi & Terracotta Relief",
+          mediums: ["Ken River Terracotta Clay", "Natural Chalk & Iron Ochre", "Mixed Media on Handmade Jute Board"],
+          experienceYears: 28,
+          artworkCount: 6,
+          awards: ["State Heritage Artisan Fellowship", "Nari Shakti Shilp Award"],
+          featured: true,
+          order: 2,
+        },
+        {
+          name: "Mahendra Singh Bundela",
+          slug: "mahendra-bundela",
+          location: "Orchha, Madhya Pradesh",
+          region: "Bundelkhand",
+          role: "Classical Miniature & Architectural Artist",
+          avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=400&q=80",
+          coverImage: "https://images.unsplash.com/photo-1599839575945-a9e5af0c3fa5?auto=format&fit=crop&w=1400&q=80",
+          shortBio: "Bridges medieval Bundela royal court miniature painting with exquisite botanical and palace studies.",
+          biography: "Mahendra Singh Bundela grew up in the shadow of Orchha's towering chhatris and cenotaphs on the Betwa riverbank. His brushwork captures the architectural grandeur of Bundela stone domes alongside intimate depictions of court musicians and wild peacocks.",
+          journey: "Trained in both fine arts and classical restoration, Mahendra has spent twenty years perfecting the delicate squirrel-hair brush technique required for microscopic details in royal textiles, pearl necklaces, and sandstone lattices.",
+          style: "Bundelkhand Court Miniature",
+          mediums: ["Gouache on Aged Rice Paper", "Tempera on Wasli", "Silver Foil on Khadi"],
+          experienceYears: 22,
+          artworkCount: 7,
+          awards: ["All India Fine Arts Award", "Madhya Pradesh Shilp Samman"],
+          featured: true,
+          order: 3,
+        },
+        {
+          name: "Yashodhara Sen",
+          slug: "yashodhara-sen",
+          location: "Khajuraho, Madhya Pradesh",
+          region: "Bundelkhand",
+          role: "Bronze & Sandstone Sculptor",
+          avatar: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=400&q=80",
+          coverImage: "https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&w=1400&q=80",
+          shortBio: "Channeling the sensuous curves and spiritual symmetry of the Chandela dynasty temple sculptures.",
+          biography: "Based near the Western Group of Khajuraho Temples, Yashodhara Sen works with indigenous Vindhyan buff sandstone and cire-perdue (lost wax) bronze casting. Her sculptures honor classical iconography while speaking in a clean, modern spatial cadence.",
+          journey: "A graduate of Santiniketan with apprenticeships under traditional temple sthapatis, Yashodhara creates monumental public sculptures as well as refined gallery collector pieces.",
+          style: "Classical Chandela Revival & Bell Metal",
+          mediums: ["Vindhyan Sandstone", "Lost-Wax Cast Bronze", "Oxidized Brass Alloy"],
+          experienceYears: 19,
+          artworkCount: 5,
+          awards: ["National Sculpture Triennale Medal", "Khajuraho Art Laureate"],
+          featured: true,
+          order: 4,
+        },
+        {
+          name: "Anand Singh Shyam",
+          slug: "anand-shyam",
+          location: "Dindori & Bhopal, Madhya Pradesh",
+          region: "Central India",
+          role: "Pardhan Gond Master Painter",
+          avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=400&q=80",
+          coverImage: "https://images.unsplash.com/photo-1577083552431-6e5fd01aa342?auto=format&fit=crop&w=1400&q=80",
+          shortBio: "Weaving cosmic folklore, sacred Mahua trees, and mythological beasts with mesmerizing signature dots and lines.",
+          biography: "Anand Singh Shyam continues the internationally acclaimed Pardhan Gond painting tradition. His canvases celebrate the belief that viewing a blessed visual image brings auspicious fortune and harmony with the natural elements.",
+          journey: "Featured in exhibitions across Paris, Tokyo, and New Delhi, Anand brings vibrant modern acrylics into harmony with tribal mythologies that date back thousands of years.",
+          style: "Pardhan Gond Tribal Narrative",
+          mediums: ["Acrylic & Natural Gum on Belgian Linen", "Ink on Archival Canvas"],
+          experienceYears: 25,
+          artworkCount: 6,
+          awards: ["Padma Shri Nominee", "Tulsi Samman for Tribal Arts"],
+          featured: false,
+          order: 5,
+        },
+        {
+          name: "Rukmani Devi Chandel",
+          slug: "rukmani-devi-chandel",
+          location: "Datia, Bundelkhand",
+          region: "Bundelkhand",
+          role: "Pahari & Bundeli Miniature Specialist",
+          avatar: "https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=400&q=80",
+          coverImage: "https://images.unsplash.com/photo-1606744837616-56c9a5c6a6eb?auto=format&fit=crop&w=1400&q=80",
+          shortBio: "Specialist in the illuminated Govardhan and Raslila manuscript paintings of Datia Palace.",
+          biography: "Hailing from the historic principality of Datia, Rukmani Devi has spent thirty years reproducing and reinterpreting the illuminated Vaishnava manuscripts that adorned the library of Raja Bir Singh Dev.",
+          journey: "Her delicate portrayal of eyes, flowing dupattas, and star-studded skies reflects the lyrical romanticism that makes Bundeli art unique in Indian history.",
+          style: "Datia Illuminated Miniature",
+          mediums: ["Mineral Colors on Sanganeri Wasli", "22k Gold Powder Inlay"],
+          experienceYears: 31,
+          artworkCount: 5,
+          awards: ["Rashtriya Shilpi Fellowship"],
+          featured: false,
+          order: 6,
         },
       ]);
     }

@@ -41,11 +41,24 @@ const newsSchema = new mongoose.Schema(
     },
     image: {
       type: String,
-      required: [true, "News cover image URL is required"],
+      default: "https://images.unsplash.com/photo-1579783902614-a3fb3927b675?auto=format&fit=crop&w=1200&q=85",
     },
     imagePublicId: {
       type: String,
       default: "",
+    },
+    video: {
+      type: String,
+      default: "",
+    },
+    videoPublicId: {
+      type: String,
+      default: "",
+    },
+    mediaType: {
+      type: String,
+      enum: ["image", "video"],
+      default: "image",
     },
     summary: {
       type: String,

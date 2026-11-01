@@ -38,12 +38,13 @@ export const uploadBufferToCloudinary = (buffer, folder = "bundeli-kalavrat", op
 /**
  * Delete an asset from Cloudinary by public ID
  * @param {string} publicId
+ * @param {object} options - Optional deletion options (e.g. { resource_type: "video" })
  * @returns {Promise<any>}
  */
-export const deleteFromCloudinary = async (publicId) => {
+export const deleteFromCloudinary = async (publicId, options = {}) => {
   if (!publicId) return null;
   try {
-    const result = await cloudinary.uploader.destroy(publicId);
+    const result = await cloudinary.uploader.destroy(publicId, options);
     return result;
   } catch (error) {
     console.warn(`Cloudinary deletion warning for ${publicId}:`, error?.message || error);

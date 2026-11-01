@@ -19,6 +19,7 @@ import celebrityPatronRouter from "./routes/celebrityPatron.routes.js";
 import newsRouter from "./routes/news.routes.js";
 import blogRouter from "./routes/blog.routes.js";
 import reviewRouter from "./routes/review.routes.js";
+import artistRouter from "./routes/artist.routes.js";
 
 const app = express();
 
@@ -64,6 +65,7 @@ app.get("/api/health", (req, res) => {
       news: "/api/news",
       blogs: "/api/blogs",
       reviews: "/api/reviews",
+      artists: "/api/artists",
     },
   });
 });
@@ -80,6 +82,7 @@ app.use("/api/celebrity-paintings", celebrityPatronRouter);
 app.use("/api/news", newsRouter);
 app.use("/api/blogs", blogRouter);
 app.use("/api/reviews", reviewRouter);
+app.use("/api/artists", artistRouter);
 
 // Global Error Handler (for Multer and unexpected errors)
 app.use((err, req, res, next) => {

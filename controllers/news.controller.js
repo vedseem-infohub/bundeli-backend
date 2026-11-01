@@ -46,11 +46,11 @@ export const getNewsByIdOrSlug = async (req, res) => {
   }
 };
 
-// @desc    Add a new news dispatch (with Cloudinary image upload)
+// @desc    Add a new news dispatch (with Cloudinary image & video upload)
 // @route   POST /api/news
 export const addNews = async (req, res) => {
   try {
-    const { title, badge, outlet, date, readTime, summary, content, link, order } = req.body;
+    const { title, badge, outlet, date, readTime, summary, content, link, order, mediaType } = req.body;
 
     if (!title) {
       return res.status(400).json({ success: false, message: "News title is required" });
@@ -62,26 +62,51 @@ export const addNews = async (req, res) => {
       slug = `${slug}-${Date.now().toString().slice(-4)}`;
     }
 
-    let imageUrl = req.body.image;
+    let imageUrl = req.body.image || "";
     let imagePublicId = "";
+    let videoUrl = req.body.video || "";
+    let videoPublicId = "";
 
-    if (req.file) {
-      const uploadResult = await uploadBufferToCloudinary(req.file.buffer, "bundeli/news");
+    // 1. Process Image Upload
+    const imageFile = req.files?.image?.[0] || (req.file?.mimetype?.startsWith("image/") ? req.file : null);
+    if (imageFile) {
+      const uploadResult = await uploadBufferToCloudinary(imageFile.buffer, "bundeli/news/images");
       imageUrl = uploadResult.secure_url;
       imagePublicId = uploadResult.public_id;
     }
 
-    if (!imageUrl) {
+    // 2. Process Video Upload
+    const videoFile = req.files?.video?.[0] || (req.file?.mimetype?.startsWith("video/") ? req.file : null);
+    if (videoFile) {
+      const uploadResult = await uploadBufferToCloudinary(videoFile.buffer, "bundeli/news/videos", {
+        resource_type: "video",
+      });
+      videoUrl = uploadResult.secure_url;
+      videoPublicId = uploadResult.public_id;
+    }
+
+    // Auto-generate poster from Cloudinary video if no image provided
+    if (!imageUrl && videoUrl) {
+      if (videoUrl.includes("res.cloudinary.com")) {
+        imageUrl = videoUrl.replace(/\.[^/.]+$/, ".jpg");
+      } else {
+        imageUrl = "https://images.unsplash.com/photo-1579783902614-a3fb3927b675?auto=format&fit=crop&w=1200&q=85";
+      }
+    }
+
+    if (!imageUrl && !videoUrl) {
       return res.status(400).json({
         success: false,
-        message: "News image is required (upload file or image URL).",
+        message: "Please upload an image or video for this news dispatch.",
       });
     }
+
+    const determinedMediaType = mediaType || (videoUrl ? "video" : "image");
 
     const newNews = await News.create({
       title: title.trim(),
       slug,
-      badge: badge || "PRESS & DISPATCH",
+      badge: badge || (videoUrl ? "VIDEO DISPATCH" : "PRESS & DISPATCH"),
       outlet: outlet || "Bundeli Kalavrat Press",
       date:
         date ||
@@ -93,6 +118,9 @@ export const addNews = async (req, res) => {
       readTime: readTime || "4 min read",
       image: imageUrl,
       imagePublicId,
+      video: videoUrl,
+      videoPublicId,
+      mediaType: determinedMediaType,
       summary: summary || "",
       content: content || "",
       link: link || "",
@@ -121,15 +149,34 @@ export const updateNews = async (req, res) => {
       return res.status(404).json({ success: false, message: "News item not found" });
     }
 
-    if (req.file) {
+    // Image file update
+    const imageFile = req.files?.image?.[0] || (req.file?.mimetype?.startsWith("image/") ? req.file : null);
+    if (imageFile) {
       if (item.imagePublicId) {
         await deleteFromCloudinary(item.imagePublicId);
       }
-      const uploadResult = await uploadBufferToCloudinary(req.file.buffer, "bundeli/news");
+      const uploadResult = await uploadBufferToCloudinary(imageFile.buffer, "bundeli/news/images");
       item.image = uploadResult.secure_url;
       item.imagePublicId = uploadResult.public_id;
     } else if (req.body.image) {
       item.image = req.body.image;
+    }
+
+    // Video file update
+    const videoFile = req.files?.video?.[0] || (req.file?.mimetype?.startsWith("video/") ? req.file : null);
+    if (videoFile) {
+      if (item.videoPublicId) {
+        await deleteFromCloudinary(item.videoPublicId, { resource_type: "video" });
+      }
+      const uploadResult = await uploadBufferToCloudinary(videoFile.buffer, "bundeli/news/videos", {
+        resource_type: "video",
+      });
+      item.video = uploadResult.secure_url;
+      item.videoPublicId = uploadResult.public_id;
+      item.mediaType = "video";
+    } else if (req.body.video !== undefined) {
+      item.video = req.body.video;
+      if (req.body.video) item.mediaType = "video";
     }
 
     if (req.body.title) {
@@ -143,6 +190,7 @@ export const updateNews = async (req, res) => {
     if (req.body.summary !== undefined) item.summary = req.body.summary;
     if (req.body.content !== undefined) item.content = req.body.content;
     if (req.body.link !== undefined) item.link = req.body.link;
+    if (req.body.mediaType !== undefined) item.mediaType = req.body.mediaType;
     if (req.body.order !== undefined) item.order = Number(req.body.order);
 
     const updated = await item.save();
@@ -171,6 +219,9 @@ export const deleteNews = async (req, res) => {
 
     if (item.imagePublicId) {
       await deleteFromCloudinary(item.imagePublicId);
+    }
+    if (item.videoPublicId) {
+      await deleteFromCloudinary(item.videoPublicId, { resource_type: "video" });
     }
 
     await News.findByIdAndDelete(id);
