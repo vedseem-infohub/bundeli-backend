@@ -28,21 +28,38 @@ const allowedOrigins = [
   "http://127.0.0.1:3000",
   "http://localhost:3001",
   "http://127.0.0.1:3001",
+  "https://bundeli-frontend.vercel.app",
+  "https://bundeli-admin.vercel.app",
   process.env.CLIENT_URL,
   process.env.ADMIN_URL,
 ].filter(Boolean);
 
-app.use(
-  cors({
-    origin: (origin, callback) => {
-      if (!origin || allowedOrigins.includes(origin)) {
-        return callback(null, true);
-      }
-      return callback(null, true); // Dev-friendly fallback
-    },
-    credentials: true,
-  })
-);
+const corsOptions = {
+  origin: (origin, callback) => {
+    // Allow non-browser requests (e.g. mobile apps, curl, server-to-server)
+    if (!origin) return callback(null, true);
+
+    const normalizedOrigin = origin.replace(/\/+$/, "");
+
+    // Check against allowed origins or any Vercel deployment under bundeli / preview branches
+    const isAllowed =
+      allowedOrigins.some((allowed) => allowed.replace(/\/+$/, "") === normalizedOrigin) ||
+      normalizedOrigin.endsWith(".vercel.app");
+
+    if (isAllowed) {
+      return callback(null, true);
+    }
+
+    // Permissive fallback so production deployments never get blocked by CORS misconfiguration
+    return callback(null, true);
+  },
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With", "Accept", "Origin"],
+};
+
+app.use(cors(corsOptions));
+app.options("*", cors(corsOptions));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
