@@ -14,7 +14,7 @@ const createSlug = (text) =>
 // @route   GET /api/categories
 export const getCategories = async (req, res) => {
   try {
-    const categories = await Category.find().sort({ order: 1, createdAt: -1 });
+    const categories = await Category.find().sort({ order: 1, createdAt: -1 }).lean();
     return res.status(200).json({ success: true, count: categories.length, data: categories });
   } catch (error) {
     console.error("Error fetching categories:", error);
@@ -30,10 +30,10 @@ export const getCategoryByIdOrSlug = async (req, res) => {
     let category = null;
 
     if (idOrSlug.match(/^[0-9a-fA-F]{24}$/)) {
-      category = await Category.findById(idOrSlug);
+      category = await Category.findById(idOrSlug).lean();
     }
     if (!category) {
-      category = await Category.findOne({ slug: idOrSlug.toLowerCase() });
+      category = await Category.findOne({ slug: idOrSlug.toLowerCase() }).lean();
     }
 
     if (!category) {

@@ -9,7 +9,7 @@ export const getAchievements = async (req, res) => {
     const filter = { isActive: true };
     if (type) filter.type = type;
 
-    const achievements = await Achievement.find(filter).sort({ order: 1, createdAt: 1 });
+    const achievements = await Achievement.find(filter).sort({ order: 1, createdAt: 1 }).lean();
     return res.status(200).json({ success: true, count: achievements.length, data: achievements });
   } catch (error) {
     console.error("Error fetching achievements:", error);

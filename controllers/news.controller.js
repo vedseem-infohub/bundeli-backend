@@ -13,7 +13,7 @@ const createSlug = (text) =>
 // @route   GET /api/news
 export const getAllNews = async (req, res) => {
   try {
-    const news = await News.find().sort({ order: 1, createdAt: -1 });
+    const news = await News.find().sort({ order: 1, createdAt: -1 }).lean();
     return res.status(200).json({ success: true, count: news.length, data: news });
   } catch (error) {
     console.error("Error fetching news:", error);
@@ -29,10 +29,10 @@ export const getNewsByIdOrSlug = async (req, res) => {
     let item = null;
 
     if (idOrSlug.match(/^[0-9a-fA-F]{24}$/)) {
-      item = await News.findById(idOrSlug);
+      item = await News.findById(idOrSlug).lean();
     }
     if (!item) {
-      item = await News.findOne({ slug: idOrSlug.toLowerCase() });
+      item = await News.findOne({ slug: idOrSlug.toLowerCase() }).lean();
     }
 
     if (!item) {

@@ -13,13 +13,28 @@ const createSlug = (text) =>
 // @route   GET /api/artworks
 export const getArtworks = async (req, res) => {
   try {
-    const { category, isNew, isFeatured, search } = req.query;
+    const { category, categorySlug, isNew, isFeatured, search, collection, collectionSlug, artist, artistSlug } = req.query;
     const filter = {};
 
-    if (category) {
+    if (category || categorySlug) {
+      const catVal = categorySlug || category;
       filter.$or = [
-        { category: new RegExp(category, "i") },
-        { categorySlug: category.toLowerCase() },
+        { category: new RegExp(catVal, "i") },
+        { categorySlug: catVal.toLowerCase() },
+      ];
+    }
+    if (collection || collectionSlug) {
+      const colVal = collectionSlug || collection;
+      filter.$or = [
+        { collectionName: new RegExp(colVal, "i") },
+        { collectionSlug: colVal.toLowerCase() },
+      ];
+    }
+    if (artist || artistSlug) {
+      const artVal = artistSlug || artist;
+      filter.$or = [
+        { artist: new RegExp(artVal, "i") },
+        { artistSlug: artVal.toLowerCase() },
       ];
     }
     if (isNew !== undefined) {
@@ -33,10 +48,11 @@ export const getArtworks = async (req, res) => {
         { title: new RegExp(search, "i") },
         { artist: new RegExp(search, "i") },
         { description: new RegExp(search, "i") },
+        { style: new RegExp(search, "i") },
       ];
     }
 
-    const artworks = await Artwork.find(filter).sort({ createdAt: -1 });
+    const artworks = await Artwork.find(filter).sort({ createdAt: -1 }).lean();
     return res.status(200).json({ success: true, count: artworks.length, data: artworks });
   } catch (error) {
     console.error("Error fetching artworks:", error);
@@ -48,7 +64,7 @@ export const getArtworks = async (req, res) => {
 // @route   GET /api/artworks/new-arrivals
 export const getNewArrivals = async (req, res) => {
   try {
-    const artworks = await Artwork.find({ isNew: true }).sort({ createdAt: -1 });
+    const artworks = await Artwork.find({ isNew: true }).sort({ createdAt: -1 }).lean();
     return res.status(200).json({ success: true, count: artworks.length, data: artworks });
   } catch (error) {
     console.error("Error fetching new arrivals:", error);
@@ -64,10 +80,10 @@ export const getArtworkByIdOrSlug = async (req, res) => {
     let artwork = null;
 
     if (idOrSlug.match(/^[0-9a-fA-F]{24}$/)) {
-      artwork = await Artwork.findById(idOrSlug);
+      artwork = await Artwork.findById(idOrSlug).lean();
     }
     if (!artwork) {
-      artwork = await Artwork.findOne({ slug: idOrSlug.toLowerCase() });
+      artwork = await Artwork.findOne({ slug: idOrSlug.toLowerCase() }).lean();
     }
 
     if (!artwork) {
