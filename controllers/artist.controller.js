@@ -56,7 +56,7 @@ export const getArtists = async (req, res) => {
       ];
     }
 
-    const artists = await Artist.find(filter).sort({ order: 1, createdAt: -1 });
+    const artists = await Artist.find(filter).sort({ order: 1, createdAt: -1 }).lean();
 
     return res.status(200).json({
       success: true,
@@ -81,11 +81,11 @@ export const getArtistBySlug = async (req, res) => {
 
     let artist = null;
     if (mongoose.Types.ObjectId.isValid(slugOrId)) {
-      artist = await Artist.findById(slugOrId);
+      artist = await Artist.findById(slugOrId).lean();
     }
 
     if (!artist) {
-      artist = await Artist.findOne({ slug: slugOrId.toLowerCase() });
+      artist = await Artist.findOne({ slug: slugOrId.toLowerCase() }).lean();
     }
 
     if (!artist) {

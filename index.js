@@ -82,6 +82,7 @@ app.get("/api/health", (req, res) => {
       blogs: "/api/blogs",
       reviews: "/api/reviews",
       artists: "/api/artists",
+      contactInfo: "/api/auth/contact-info",
     },
   });
 });

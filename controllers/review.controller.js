@@ -15,7 +15,7 @@ export const getReviews = async (req, res) => {
       filter.rating = Number(rating);
     }
 
-    const reviews = await Review.find(filter).sort({ createdAt: -1 });
+    const reviews = await Review.find(filter).sort({ createdAt: -1 }).lean();
     return res.status(200).json({ success: true, count: reviews.length, data: reviews });
   } catch (error) {
     console.error("Error fetching reviews:", error);

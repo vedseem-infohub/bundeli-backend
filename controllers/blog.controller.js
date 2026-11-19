@@ -25,7 +25,7 @@ export const getBlogs = async (req, res) => {
       ];
     }
 
-    const blogs = await Blog.find(filter).sort({ createdAt: -1 });
+    const blogs = await Blog.find(filter).sort({ createdAt: -1 }).lean();
     return res.status(200).json({ success: true, count: blogs.length, data: blogs });
   } catch (error) {
     console.error("Error fetching blogs:", error);
@@ -41,10 +41,10 @@ export const getBlogByIdOrSlug = async (req, res) => {
     let blog = null;
 
     if (idOrSlug.match(/^[0-9a-fA-F]{24}$/)) {
-      blog = await Blog.findById(idOrSlug);
+      blog = await Blog.findById(idOrSlug).lean();
     }
     if (!blog) {
-      blog = await Blog.findOne({ slug: idOrSlug.toLowerCase() });
+      blog = await Blog.findOne({ slug: idOrSlug.toLowerCase() }).lean();
     }
 
     if (!blog) {

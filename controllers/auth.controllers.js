@@ -176,6 +176,26 @@ export const adminLogin = async (req, res) => {
         email: user.email,
         role: user.role,
         phone: user.phone || "",
+        mobileNo: user.mobileNo || user.phone || "",
+        whatsappNo: user.whatsappNo || "",
+        atelierTitle: user.atelierTitle || "Bundeli Royal Atelier Master & Senior Conservator",
+        bio: user.bio || "",
+        address: user.address || {
+          street: "",
+          city: "Orchha",
+          state: "Madhya Pradesh",
+          pincode: "472246",
+          country: "India",
+        },
+        socialLinks: user.socialLinks || {
+          instagram: "",
+          facebook: "",
+          twitter: "",
+          youtube: "",
+          linkedin: "",
+          pinterest: "",
+          website: "",
+        },
         avatar: user.avatar || "",
       },
     });
@@ -397,5 +417,110 @@ export const logOut = async (req, res) => {
   } catch (error) {
     console.error("Logout error:", error);
     return res.status(500).json({ success: false, message: `Logout error: ${error.message || error}` });
+  }
+};
+
+/**
+ * Public endpoint to fetch atelier contact details and official social media links
+ * (Accessible by visitors on the frontend showcase without authentication)
+ */
+export const getPublicAtelierContact = async (req, res) => {
+  try {
+    // Find the primary/most recently updated admin/superadmin with contact info
+    const admin = await User.findOne({
+      role: { $in: ["superadmin", "admin", "curator"] },
+    })
+      .sort({ updatedAt: -1, createdAt: 1 })
+      .select("-password")
+      .lean();
+
+    const fallbackAddress = {
+      street: "Raja Ram Marg, Opposite Jahangir Mahal",
+      city: "Orchha",
+      state: "Madhya Pradesh",
+      pincode: "472246",
+      country: "India",
+      formatted:
+        "Raja Ram Marg, Opposite Jahangir Mahal, Orchha 472246, Niwari District, Madhya Pradesh, India",
+    };
+
+    if (!admin) {
+      return res.status(200).json({
+        success: true,
+        data: {
+          name: "Bundeli Kalavrat Atelier",
+          atelierTitle: "Bundeli Royal Atelier Master & Senior Conservator",
+          email: "curator@bundelikalavrat.com",
+          phone: "+91 7686 288 411",
+          mobileNo: "+91 7686 288 411",
+          whatsappNo: "917686288411",
+          bio: "Guardian of Bundelkhand's 400-year-old royal fresco and temple sculpture heritage.",
+          address: fallbackAddress,
+          socialLinks: {
+            instagram: "https://instagram.com/bundeli_kalavrat",
+            facebook: "https://facebook.com/bundelikalavrat",
+            twitter: "https://x.com/bundeliart",
+            youtube: "https://youtube.com/@bundelikalavrat",
+            linkedin: "",
+            pinterest: "",
+            website: "",
+          },
+        },
+      });
+    }
+
+    const street = admin.address?.street?.trim() || fallbackAddress.street;
+    const city = admin.address?.city?.trim() || fallbackAddress.city;
+    const state = admin.address?.state?.trim() || fallbackAddress.state;
+    const pincode = admin.address?.pincode?.trim() || fallbackAddress.pincode;
+    const country = admin.address?.country?.trim() || fallbackAddress.country;
+
+    const formattedAddress = [
+      street,
+      city,
+      state && pincode ? `${state} ${pincode}` : state || pincode,
+      country,
+    ]
+      .filter(Boolean)
+      .join(", ");
+
+    return res.status(200).json({
+      success: true,
+      data: {
+        name: admin.name || "Bundeli Kalavrat Atelier",
+        atelierTitle:
+          admin.atelierTitle || "Bundeli Royal Atelier Master & Senior Conservator",
+        email: admin.email || "curator@bundelikalavrat.com",
+        phone: admin.phone || admin.mobileNo || "+91 7686 288 411",
+        mobileNo: admin.mobileNo || admin.phone || "+91 7686 288 411",
+        whatsappNo:
+          admin.whatsappNo || admin.mobileNo || admin.phone || "917686288411",
+        bio: admin.bio || "",
+        address: {
+          street,
+          city,
+          state,
+          pincode,
+          country,
+          formatted: formattedAddress || fallbackAddress.formatted,
+        },
+        socialLinks: {
+          instagram: admin.socialLinks?.instagram || "",
+          facebook: admin.socialLinks?.facebook || "",
+          twitter: admin.socialLinks?.twitter || "",
+          youtube: admin.socialLinks?.youtube || "",
+          linkedin: admin.socialLinks?.linkedin || "",
+          pinterest: admin.socialLinks?.pinterest || "",
+          website: admin.socialLinks?.website || "",
+        },
+      },
+    });
+  } catch (error) {
+    console.error("Error fetching public atelier contact:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Failed to retrieve atelier contact details",
+      error: error.message,
+    });
   }
 };

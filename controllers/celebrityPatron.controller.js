@@ -5,7 +5,7 @@ import { uploadBufferToCloudinary, deleteFromCloudinary } from "../config/cloudi
 // @route   GET /api/celebrity-paintings
 export const getCelebrityPaintings = async (req, res) => {
   try {
-    const list = await CelebrityPatron.find().sort({ order: 1, createdAt: -1 });
+    const list = await CelebrityPatron.find().sort({ order: 1, createdAt: -1 }).lean();
     return res.status(200).json({ success: true, count: list.length, data: list });
   } catch (error) {
     console.error("Error fetching celebrity paintings:", error);
@@ -22,7 +22,7 @@ export const getCelebrityPaintings = async (req, res) => {
 export const getCelebrityPaintingById = async (req, res) => {
   try {
     const { id } = req.params;
-    const item = await CelebrityPatron.findById(id);
+    const item = await CelebrityPatron.findById(id).lean();
     if (!item) {
       return res.status(404).json({ success: false, message: "Item not found" });
     }

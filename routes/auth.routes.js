@@ -6,6 +6,7 @@ import {
   adminLogin,
   getAdminProfile,
   updateAdminProfile,
+  getPublicAtelierContact,
 } from "../controllers/auth.controllers.js";
 import isAuth from "../middlewares/isAuth.js";
 
@@ -15,6 +16,10 @@ const authRouter = express.Router();
 authRouter.post("/signup", signUp);
 authRouter.post("/signin", Login);
 authRouter.post("/login", Login);
+
+// Public atelier contact & social media information (no auth required)
+authRouter.get("/contact-info", getPublicAtelierContact);
+authRouter.get("/atelier-contact", getPublicAtelierContact);
 
 // Strict Admin authentication
 authRouter.post("/admin-login", adminLogin);
